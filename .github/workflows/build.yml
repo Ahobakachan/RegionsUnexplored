@@ -1,0 +1,36 @@
+name: Build Regions Unexplored
+
+on:
+  push:
+    branches:
+      - autumnity-maple-integration
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build NeoForge 1.21.1
+        run: ./gradlew build --no-daemon
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: regions-unexplored-autumnity-maple-integration
+          path: build/libs/*.jar
+          if-no-files-found: error
