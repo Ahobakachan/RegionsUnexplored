@@ -1,5 +1,6 @@
 package net.regions_unexplored.block.plant.food;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -46,6 +47,11 @@ public class FoulBerryBushBlock extends BushBlock implements BonemealableBlock {
     public FoulBerryBushBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(AGE, 0));
+    }
+
+    @Override
+    protected MapCodec<? extends BushBlock> codec() {
+        return null;
     }
 
     @Override
