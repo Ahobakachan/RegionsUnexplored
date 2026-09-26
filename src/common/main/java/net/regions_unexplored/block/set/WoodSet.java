@@ -97,15 +97,23 @@ public class WoodSet {
             this.strippedLog = RUBlockUtils.register("stripped_" + typeName + "_" + logName, p -> RUBlockUtils.wood(p, plankColour, sound, fireproof));
             this.strippedWood = RUBlockUtils.register("stripped_" + typeName + "_" + woodName, p -> RUBlockUtils.wood(p, plankColour, sound, fireproof));
 
-            var sappyLog = RUBlockUtils.registerNoItem("sappy_maple_log",
-                    p -> new MapleSappyLogBlock(this.strippedLog, RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof)));
-            var sappyWood = RUBlockUtils.registerNoItem("sappy_maple_wood",
-                    p -> new MapleSappyLogBlock(this.strippedWood, RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof)));
+            var sappyLog = RUBlockUtils.registerNoItem("sappy_maple_log", p -> {
+                RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof);
+                return new MapleSappyLogBlock(this.strippedLog, p);
+            });
+            var sappyWood = RUBlockUtils.registerNoItem("sappy_maple_wood", p -> {
+                RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof);
+                return new MapleSappyLogBlock(this.strippedWood, p);
+            });
 
-            this.log = RUBlockUtils.register(typeName + "_" + logName,
-                    p -> new MapleLogBlock(this.strippedLog, sappyLog, RUBlockUtils.log(p, logFactory, plankColour, logColour, sound, fireproof).properties()));
-            this.wood = RUBlockUtils.register(typeName + "_" + woodName,
-                    p -> new MapleLogBlock(this.strippedWood, sappyWood, RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof).properties()));
+            this.log = RUBlockUtils.register(typeName + "_" + logName, p -> {
+                RUBlockUtils.log(p, logFactory, plankColour, logColour, sound, fireproof);
+                return new MapleLogBlock(this.strippedLog, sappyLog, p);
+            });
+            this.wood = RUBlockUtils.register(typeName + "_" + woodName, p -> {
+                RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof);
+                return new MapleLogBlock(this.strippedWood, sappyWood, p);
+            });
             return;
         }
 
