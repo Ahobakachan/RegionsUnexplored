@@ -15,6 +15,7 @@ import net.regions_unexplored.block.set.BrimwoodWoodSet;
 import net.regions_unexplored.block.set.ColoredSet;
 import net.regions_unexplored.block.set.NaturalSet;
 import net.regions_unexplored.block.set.WoodSet;
+import net.regions_unexplored.block.plant.food.FoulBerryBushBlock;
 import net.regions_unexplored.block.RuWoodTypes;
 import net.regions_unexplored.block.type.dirt.*;
 import net.regions_unexplored.block.type.flower.LargeFlowerBlock;
