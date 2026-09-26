@@ -159,6 +159,10 @@ public interface RUCreativeModeTabs {
             output.accept(RUBlocks.GLISTERING_IVY.get().asItem());
             //FOOD_PLANT_BLOCKS
             output.accept(RUItems.SALMONBERRY.get().asItem());
+            output.accept(RUItems.FOUL_BERRIES.get());
+            output.accept(RUItems.MAPLE_SAP_BOTTLE.get());
+            output.accept(RUItems.MAPLE_SYRUP_BOTTLE.get());
+            output.accept(RUItems.SNAIL_SHELL_PIECE.get());
             output.accept(RUBlocks.HANGING_EARLIGHT.get().asItem());
             /*-----------------PLANT_BLOCKS-----------------*/
             //MUSHROOMS
@@ -330,6 +334,8 @@ public interface RUCreativeModeTabs {
     static void addToFoodAndDrinks(BiConsumer<ItemLike, ItemLike> consumer) {
         consumer.accept(Items.MELON_SLICE, RUItems.DUSKMELON_SLICE.get());
         consumer.accept(Items.SWEET_BERRIES, RUItems.SALMONBERRY.get());
+        consumer.accept(Items.SWEET_BERRIES, RUItems.FOUL_BERRIES.get());
+        consumer.accept(Items.HONEY_BOTTLE, RUItems.MAPLE_SYRUP_BOTTLE.get());
         consumer.accept(Items.GLOW_BERRIES, RUItems.HANGING_EARLIGHT_FRUIT.get());
         consumer.accept(Items.BEETROOT, RUItems.MEADOW_SAGE.get());
     }
