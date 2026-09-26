@@ -1,0 +1,8 @@
+{
+  "parent":"block/cube_all",
+  "textures":{"all":"regions_unexplored:block/maple_log","particle":"regions_unexplored:block/maple_log","sap":"regions_unexplored:block/maple_sap_overlay"},
+  "elements":[
+    {"from":[0,0,0],"to":[16,16,16],"faces":{"down":{"texture":"#all"},"up":{"texture":"#all"},"north":{"texture":"#all"},"east":{"texture":"#all"},"south":{"texture":"#all"},"west":{"texture":"#all"}}},
+    {"from":[0,0,0],"to":[16.01,16.01,16.01],"shade":false,"faces":{"down":{"texture":"#sap"},"up":{"texture":"#sap"},"north":{"texture":"#sap"},"east":{"texture":"#sap"},"south":{"texture":"#sap"},"west":{"texture":"#sap"}}}
+  ]
+}
