@@ -310,6 +310,7 @@ public interface RUBlocks {
 
     //FOOD_PLANT_BLOCKS
     Supplier<Block> SALMONBERRY_BUSH = RUBlockUtils.registerNoItem("salmonberry_bush", p -> new SalmonBerryBushBlock(p.pushReaction(PushReaction.BLOCK).ignitedByLava().randomTicks().noCollision().sound(SoundType.SWEET_BERRY_BUSH)));
+    Supplier<Block> FOUL_BERRY_BUSH = RUBlockUtils.register("foul_berry_bush", p -> new FoulBerryBushBlock(p.pushReaction(PushReaction.BLOCK).ignitedByLava().randomTicks().noCollision().sound(SoundType.SWEET_BERRY_BUSH)), RUItemUtils::registerBlock);
     /*-----------------PLANT_BLOCKS-----------------*/
     //MUSHROOMS
     Supplier<Block> BLUE_BIOSHROOM_BLOCK = register("blue_bioshroom_block", p -> new Block(p.mapColor(MapColor.COLOR_BLUE).instrument(NoteBlockInstrument.BASS).sound(SoundType.WART_BLOCK).strength(0.6f)));
