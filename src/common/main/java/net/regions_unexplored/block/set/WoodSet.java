@@ -12,6 +12,8 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.regions_unexplored.block.BlockFactory;
+import net.regions_unexplored.block.wood.MapleLogBlock;
+import net.regions_unexplored.block.wood.MapleSappyLogBlock;
 import net.regions_unexplored.registry.RUBlocks;
 import net.regions_unexplored.entity.custom.RuBoat;
 import net.regions_unexplored.item.type.RuBoatItem;
