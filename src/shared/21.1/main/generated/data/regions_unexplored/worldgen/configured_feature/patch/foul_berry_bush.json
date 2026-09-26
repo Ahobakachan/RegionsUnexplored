@@ -1,0 +1,34 @@
+{
+  "type":"minecraft:random_patch",
+  "config":{
+    "tries":24,
+    "xz_spread":7,
+    "y_spread":3,
+    "feature":{
+      "feature":{
+        "type":"minecraft:simple_block",
+        "config":{
+          "to_place":{
+            "type":"minecraft:simple_state_provider",
+            "state":{
+              "Name":"regions_unexplored:foul_berry_bush",
+              "Properties":{"age":"0"}
+            }
+          }
+        }
+      },
+      "placement":[
+        {
+          "type":"minecraft:block_predicate_filter",
+          "predicate":{
+            "type":"minecraft:would_survive",
+            "state":{
+              "Name":"regions_unexplored:foul_berry_bush",
+              "Properties":{"age":"0"}
+            }
+          }
+        }
+      ]
+    }
+  }
+}
