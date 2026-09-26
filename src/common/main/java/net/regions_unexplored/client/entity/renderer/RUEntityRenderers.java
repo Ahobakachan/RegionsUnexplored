@@ -6,5 +6,6 @@ import net.regions_unexplored.registry.RUEntityTypes;
 public interface RUEntityRenderers {
 	static void init() {
 		RenderHelper.registerEntityRenderer(RUEntityTypes.ASHEN.get(), AshenRenderer::new);
+		RenderHelper.registerEntityRenderer(RUEntityTypes.SNAIL.get(), SnailRenderer::new);
 	}
 }
