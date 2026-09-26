@@ -11,11 +11,8 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.regions_unexplored.entity.snail.Snail;
 
-@OnlyIn(Dist.CLIENT)
 public class SnailModel<T extends Snail> extends EntityModel<T> {
     private final ModelPart body, shell, rightEye, leftEye, rightTentacle, leftTentacle;
     private float hideAmount;
