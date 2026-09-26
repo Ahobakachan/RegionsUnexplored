@@ -21,6 +21,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.regions_unexplored.registry.RUItems;
+import net.regions_unexplored.registry.RUEntityTypes;
 
 public class Snail extends Animal {
     public Snail(EntityType<? extends Snail> type, Level level) {
