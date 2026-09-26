@@ -7,6 +7,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.regions_unexplored.entity.ashen.Ashen;
 import net.regions_unexplored.entity.custom.RuBoat;
 import net.regions_unexplored.entity.custom.RuChestBoat;
+import net.regions_unexplored.entity.snail.Snail;
 import net.regions_unexplored.module.platform.EntityHelper;
 import net.regions_unexplored.module.platform.Registrar;
 
@@ -15,6 +16,7 @@ import java.util.function.Supplier;
 public interface RUEntityTypes {
     Supplier<EntityType<RuBoat>> BOAT = register("boat", () -> EntityType.Builder.<RuBoat>of(RuBoat::new, MobCategory.MISC).sized(1.375F, 0.5625F).clientTrackingRange(10).build("boat"));
     Supplier<EntityType<RuChestBoat>> CHEST_BOAT = register("chest_boat", () -> EntityType.Builder.<RuChestBoat>of(RuChestBoat::new, MobCategory.MISC).sized(1.375F, 0.5625F).clientTrackingRange(10).build("chest_boat"));
+    Supplier<EntityType<Snail>> SNAIL = register("snail", () -> EntityType.Builder.of(Snail::new, MobCategory.CREATURE).sized(0.8F, 0.9F).eyeHeight(0.45F).clientTrackingRange(10).build("snail"));
     Supplier<EntityType<Ashen>> ASHEN = register("ashen", () -> EntityType.Builder.of(Ashen::new, MobCategory.MONSTER)
         .sized(0.6F, 1.95F)
         .eyeHeight(1.74F)
@@ -28,6 +30,8 @@ public interface RUEntityTypes {
     }
 
     static void init() {
+        EntityHelper.registerPlacement(SNAIL, SpawnPlacementTypes.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules);
+        EntityHelper.registerAttributes(SNAIL, Snail::createAttributes);
         EntityHelper.registerPlacement(ASHEN, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
         EntityHelper.registerAttributes(ASHEN, Zombie::createAttributes);
     }
