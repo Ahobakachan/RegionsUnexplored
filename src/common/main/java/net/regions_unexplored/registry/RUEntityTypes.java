@@ -2,6 +2,7 @@ package net.regions_unexplored.registry;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.regions_unexplored.entity.ashen.Ashen;
