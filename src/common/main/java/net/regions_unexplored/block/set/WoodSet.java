@@ -93,6 +93,22 @@ public class WoodSet {
     }
 
     protected void addLogs(String typeName, String logName, String woodName, SoundType sound, MapColor plankColour, MapColor logColour, boolean fireproof, BlockFactory<Block> logFactory, boolean generateStripped) {
+        if ("maple".equals(typeName) && generateStripped) {
+            this.strippedLog = RUBlockUtils.register("stripped_" + typeName + "_" + logName, p -> RUBlockUtils.wood(p, plankColour, sound, fireproof));
+            this.strippedWood = RUBlockUtils.register("stripped_" + typeName + "_" + woodName, p -> RUBlockUtils.wood(p, plankColour, sound, fireproof));
+
+            var sappyLog = RUBlockUtils.registerNoItem("sappy_maple_log",
+                    p -> new MapleSappyLogBlock(this.strippedLog, RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof)));
+            var sappyWood = RUBlockUtils.registerNoItem("sappy_maple_wood",
+                    p -> new MapleSappyLogBlock(this.strippedWood, RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof)));
+
+            this.log = RUBlockUtils.register(typeName + "_" + logName,
+                    p -> new MapleLogBlock(this.strippedLog, sappyLog, RUBlockUtils.log(p, logFactory, plankColour, logColour, sound, fireproof).properties()));
+            this.wood = RUBlockUtils.register(typeName + "_" + woodName,
+                    p -> new MapleLogBlock(this.strippedWood, sappyWood, RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof).properties()));
+            return;
+        }
+
         this.log = RUBlockUtils.register(typeName + "_" + logName, p -> RUBlockUtils.log(p, logFactory, plankColour, logColour, sound, fireproof));
         this.wood = RUBlockUtils.register(typeName + "_" + woodName, p -> RUBlockUtils.log(p, RotatedPillarBlock::new, plankColour, logColour, sound, fireproof));
         if (!generateStripped) return;
