@@ -6,6 +6,7 @@ import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.regions_unexplored.RegionsUnexplored;
 import net.regions_unexplored.client.entity.renderer.AshenRenderer;
+import net.regions_unexplored.client.entity.model.SnailModel;
 import net.regions_unexplored.module.platform.RenderHelper;
 
 public interface RUEntityModelLayers {
@@ -13,12 +14,14 @@ public interface RUEntityModelLayers {
 	ModelLayerLocation ASHEN_EYES = model("ashen", "eyes");
 	ModelLayerLocation ASHEN_INNER_ARMOR = model("ashen", "inner");
 	ModelLayerLocation ASHEN_OUTER_ARMOR = model("ashen", "outer_armor");
+	ModelLayerLocation SNAIL_MAIN = model("snail", "main");
 	
 	static void init() {
 		RenderHelper.registerLayerDefinition(ASHEN_MAIN, AshenRenderer::createMainLayer);
 		RenderHelper.registerLayerDefinition(ASHEN_EYES, AshenRenderer::createEyesLayer);
 		RenderHelper.registerLayerDefinition(ASHEN_INNER_ARMOR, () -> LayerDefinition.create(HumanoidArmorModel.createBodyLayer(new CubeDeformation(0.5f)), 64, 32));
 		RenderHelper.registerLayerDefinition(ASHEN_OUTER_ARMOR, () -> LayerDefinition.create(HumanoidArmorModel.createBodyLayer(new CubeDeformation(1f)), 64, 32));
+		RenderHelper.registerLayerDefinition(SNAIL_MAIN, SnailModel::createBodyLayer);
 	}
 	
 	private static ModelLayerLocation model(String model, String layer) {
