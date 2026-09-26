@@ -13,7 +13,7 @@
     "grass_color": 8432236,
     "mood_sound": {
       "block_search_extent": 8,
-      "offset": 2.0,
+      "offset": 2,
       "sound": "minecraft:ambient.cave",
       "tick_delay": 6000
     },
@@ -93,7 +93,8 @@
       "regions_unexplored:patch/short_grass_sparse"
     ],
     [
-      "minecraft:freeze_top_layer"
+      "minecraft:freeze_top_layer",
+      "regions_unexplored:patch/foul_berry_bush"
     ]
   ],
   "has_precipitation": true,
@@ -144,6 +145,12 @@
         "maxCount": 4,
         "minCount": 3,
         "weight": 15
+      },
+      {
+        "type": "regions_unexplored:snail",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 4
       }
     ],
     "misc": [],
