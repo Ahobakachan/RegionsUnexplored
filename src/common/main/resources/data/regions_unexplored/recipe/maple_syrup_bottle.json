@@ -1,0 +1,8 @@
+{
+  "type":"minecraft:smelting",
+  "category":"food",
+  "cookingtime":200,
+  "experience":0.35,
+  "ingredient":{"item":"regions_unexplored:maple_sap_bottle"},
+  "result":{"id":"regions_unexplored:maple_syrup_bottle","count":1}
+}
