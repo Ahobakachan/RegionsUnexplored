@@ -28,7 +28,7 @@ public class MapleSappyLogBlock extends RotatedPillarBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (stack.is(Items.GLASS_BOTTLE)) {
             stack.shrink(1);
             ItemStack sap = new ItemStack(RUItems.MAPLE_SAP_BOTTLE.get());
@@ -44,7 +44,6 @@ public class MapleSappyLogBlock extends RotatedPillarBlock {
                 player.awardStat(Stats.ITEM_USED.get(Items.GLASS_BOTTLE));
             }
 
-            level.setBlockAndUpdate(pos, state.setValue(AXIS, state.getValue(AXIS)));
             level.setBlockAndUpdate(pos, saplessBlock.get().defaultBlockState().setValue(AXIS, state.getValue(AXIS)));
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
