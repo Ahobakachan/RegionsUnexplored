@@ -19,6 +19,10 @@ public interface RUItems {
     Supplier<Item> HANGING_EARLIGHT_FRUIT = RUItemUtils.register("hanging_earlight_fruit", p -> new BlockItem(RUBlocks.HANGING_EARLIGHT.get(), p.food(food(6, 0.4f, t -> t.effect(new MobEffectInstance(MobEffects.GLOWING, 200), 0.1F)))));
     Supplier<Item> MEADOW_SAGE = RUItemUtils.register("meadow_sage", p -> new BlockItem(RUBlocks.MEADOW_SAGE.get(), p.food(food(2, 0.15f, t -> t.effect(new MobEffectInstance(MobEffects.INSTANT_HEALTH, 20), 0.5f)))));
     Supplier<Item> IRIDESCENT_RING = RUItemUtils.register("iridescent_ring", IridescentRingItem::new);
+    Supplier<Item> FOUL_BERRIES = RUItemUtils.register("foul_berries", p -> new BlockItem(RUBlocks.FOUL_BERRY_BUSH.get(), p.food(food(1, 0.1f, t -> t))));
+    Supplier<Item> MAPLE_SAP_BOTTLE = RUItemUtils.register("maple_sap_bottle", p -> new Item(p.craftRemainder(Items.GLASS_BOTTLE).stacksTo(16)));
+    Supplier<Item> MAPLE_SYRUP_BOTTLE = RUItemUtils.register("maple_syrup_bottle", p -> new Item(p.craftRemainder(Items.GLASS_BOTTLE).stacksTo(16).food(food(4, 0.3f, t -> t))));
+    Supplier<Item> SNAIL_SHELL_PIECE = RUItemUtils.register("snail_shell_piece", p -> new Item(p));
 
     static void applyAliases(BiConsumer<Identifier, Identifier> consumer) {
         consumer.accept(id("medium_grass"), id("grass_sprouts"));
