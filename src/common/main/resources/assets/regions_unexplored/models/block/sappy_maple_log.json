@@ -1,0 +1,19 @@
+{
+  "parent":"block/cube",
+  "textures":{
+    "down":"regions_unexplored:block/maple_log_top",
+    "up":"regions_unexplored:block/maple_log_top",
+    "north":"regions_unexplored:block/maple_log",
+    "east":"regions_unexplored:block/maple_log",
+    "south":"regions_unexplored:block/maple_log",
+    "west":"regions_unexplored:block/maple_log",
+    "particle":"regions_unexplored:block/maple_log_top",
+    "sap":"regions_unexplored:block/maple_sap_overlay"
+  },
+  "elements":[
+    {"from":[0,0,0],"to":[16,16,16],"faces":{
+      "down":{"texture":"#down"},"up":{"texture":"#up"},"north":{"texture":"#north"},"east":{"texture":"#east"},"south":{"texture":"#south"},"west":{"texture":"#west"}}},
+    {"from":[0,0,0],"to":[16.01,16.01,16.01],"shade":false,"faces":{
+      "down":{"texture":"#sap"},"up":{"texture":"#sap"},"north":{"texture":"#sap"},"east":{"texture":"#sap"},"south":{"texture":"#sap"},"west":{"texture":"#sap"}}}
+  ]
+}
