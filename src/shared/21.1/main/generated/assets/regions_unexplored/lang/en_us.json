@@ -935,5 +935,11 @@
   "item.regions_unexplored.willow_chest_boat": "Willow Boat with Chest",
   "item.regions_unexplored.wisteria_boat": "Wisteria Boat",
   "item.regions_unexplored.wisteria_chest_boat": "Wisteria Boat with Chest",
-  "item_group.regions_unexplored.main": "Regions Unexplored"
+  "item_group.regions_unexplored.main": "Regions Unexplored",
+  "block.regions_unexplored.foul_berry_bush": "Foul Berry Bush",
+  "item.regions_unexplored.foul_berries": "Foul Berries",
+  "item.regions_unexplored.maple_sap_bottle": "Maple Sap",
+  "item.regions_unexplored.maple_syrup_bottle": "Maple Syrup",
+  "item.regions_unexplored.snail_shell_piece": "Snail Shell Piece",
+  "entity.regions_unexplored.snail": "Snail"
 }
