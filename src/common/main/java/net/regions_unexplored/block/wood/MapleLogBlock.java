@@ -18,10 +18,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import java.util.function.Supplier;
 
 public class MapleLogBlock extends RotatedPillarBlock {
-    private final Supplier<Block> strippedBlock;
-    private final Supplier<Block> sappyBlock;
+    private final Supplier<? extends Block> strippedBlock;
+    private final Supplier<? extends Block> sappyBlock;
 
-    public MapleLogBlock(Supplier<Block> strippedBlock, Supplier<Block> sappyBlock, Properties properties) {
+    public MapleLogBlock(Supplier<? extends Block> strippedBlock, Supplier<? extends Block> sappyBlock, Properties properties) {
         super(properties);
         this.strippedBlock = strippedBlock;
         this.sappyBlock = sappyBlock;
