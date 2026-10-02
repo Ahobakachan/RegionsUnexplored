@@ -33,6 +33,7 @@ public class RegionsUnexploredNeo {
     public static final List<Consumer<EntityAttributeCreationEvent>> ENTITY_ATTRIBUTES = new ArrayList<>();
 
     public RegionsUnexploredNeo(ModContainer container) {
+        net.regions_unexplored.compat.AlexsCavesIntegration.register(container);
         RegionsUnexplored.init();
         Registrar.register(NeoForgeRegistries.CONDITION_SERIALIZERS, "config", () -> RUConfigCondition.CODEC);
         

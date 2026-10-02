@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+[[mods]]
+modId="ru_integration_checks"
+version="1"
+displayName="Regions Unexplored Integration Checks (CI only)"
+[[dependencies.ru_integration_checks]]
+modId="regions_unexplored"
+type="required"
+versionRange="[0.6,)"
+ordering="AFTER"
+side="BOTH"

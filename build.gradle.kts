@@ -4,6 +4,7 @@ plugins {
 }
 
 repositories {
+    mavenCentral()
     cloche {
         mavenNeoforgedMeta()
         mavenNeoforged()
@@ -14,7 +15,6 @@ repositories {
         main()
     }
     mavenLocal()
-    mavenCentral()
     maven("https://api.modrinth.com/maven")
     maven("https://maven.terraformersmc.com/")
     maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")

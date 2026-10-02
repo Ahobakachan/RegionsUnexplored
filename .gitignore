@@ -23,3 +23,7 @@ eclipse
 run
 runs
 /common/src/generated/resources/.cache/
+/_upstream/
+/artifacts/
+/ci/integration/mods/
+/ci/integration/run-*/
