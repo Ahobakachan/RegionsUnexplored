@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: alexscaves-${{ github.workflow }}-${{ github.ref }}
+  group: alexscaves-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
           java-version: '21'
           cache: gradle
       - name: Build Regions Unexplored NeoForge
-        run: bash gradlew neoforge211RemapJar -x downloadNeoforge211Assets --no-daemon
+        run: bash gradlew neoforge211IncludeJar -x downloadNeoforge211Assets --no-daemon
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: AlexModGuy/Citadel

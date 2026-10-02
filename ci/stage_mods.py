@@ -9,7 +9,7 @@ destination.mkdir(parents=True, exist_ok=True)
 if mode == "build":
     roots = [Path("build/libs"), Path("_upstream/Citadel/build/libs"), Path("_upstream/AlexsCaves/build/libs")]
     for root in roots:
-        jars = [p for p in root.rglob("*.jar") if not any(s in p.name for s in ("sources", "javadoc", "dev", "data"))]
+        jars = [p for p in root.glob("*.jar") if not any(s in p.name for s in ("sources", "javadoc", "dev", "data"))]
         if root == Path("build/libs"):
             jars = [p for p in jars if "neoforge" in p.name]
         if len(jars) != 1:

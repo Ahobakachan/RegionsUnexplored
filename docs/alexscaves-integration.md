@@ -14,6 +14,8 @@ All six biomes can appear in newly generated Overworld chunks. Land caves accept
 ordinary inland climates, and Abyssal Chasm accepts ocean climates. Upstream depth,
 dimension, distance and per-biome disable settings remain effective. The X distance
 conversion is corrected and distance calculations cannot overflow near the world border.
+Temperature and humidity restrictions are also applied to their corresponding
+climate samples, correcting the swapped upstream checks.
 
 The default average radius is **224 blocks**, with a **1600-block separation
 parameter** (1824-block Voronoi cell spacing). Suitable climate, depth and cave type
@@ -23,6 +25,11 @@ Warden spawn chance: Wardens are summoned by shriekers, and their availability a
 depends on terrain. Individual cave types are rarer than the six types combined.
 
 Existing chunks keep their terrain. Create a new world or explore new chunks.
+
+Cave `/locate biome` searches explicitly use the queried world's seed and dimension,
+and only return positions inside its actual world border and build height. A small
+world border may contain no instance of a particular rare biome; in that case the
+command reports no result instead of directing a player outside the playable area.
 
 ## Maps
 
@@ -69,6 +76,9 @@ After building, the workflow boots dedicated servers with and without Alex's Cav
 It checks map restrictions, real biome-source samples across three seeds, all six cave
 types, coexistence with RU and Deep Dark, above-ground and dimension isolation,
 different layouts across seeds, and generated chunks at discovered cave locations.
+It also reproduces `/locate` searches and teleports for Magnetic Caves and the other
+cave types inside an 8192-block border, and checks that a 1024-block border cannot
+produce an unreachable result.
 Its sampling guard rejects no caves or more than 12% cave coverage at Y=-32; the
 reported fraction is a sample statistic, not a guarantee for every world.
 
@@ -77,7 +87,7 @@ Lithostitched 1.7.9 separately. The artifact also includes upstream source for r
 and licence compliance. Assertion reports and server logs are available in the
 `checks-with-caves` and `checks-ru-only` artifacts and the Actions run summary.
 
-Local checks use Java 21, `bash gradlew neoforge211RemapJar -x
+Local checks use Java 21, `bash gradlew neoforge211IncludeJar -x
 downloadNeoforge211Assets`, the two pinned upstream checkouts under `_upstream/`,
 `python3 ci/prepare_upstream.py _upstream/AlexsCaves`, their Gradle builds, and
 `python3 ci/stage_mods.py build artifacts/mods`. Stage either test mode into

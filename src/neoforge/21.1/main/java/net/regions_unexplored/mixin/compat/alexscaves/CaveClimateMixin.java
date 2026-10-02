@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class CaveClimateMixin {
     @Shadow @Final private float[] continentalness;
     @Shadow @Final private int alexscavesRarityOffset;
+    @Shadow @Final private float[] humidity;
+    @Shadow @Final private float[] temperature;
 
     @Redirect(method = "test", at = @At(value = "FIELD", opcode = Opcodes.GETFIELD,
             target = "Lcom/github/alexmodguy/alexscaves/server/config/BiomeGenerationNoiseCondition;continentalness:[F"))
@@ -25,6 +27,19 @@ public abstract class CaveClimateMixin {
             return alexscavesRarityOffset == 3 ? AlexsCavesIntegration.OCEAN : AlexsCavesIntegration.LAND;
         }
         return continentalness;
+    }
+
+    // Upstream test() samples temperature into f2 and humidity into f3, then checks the opposite arrays.
+    @Redirect(method = "test", at = @At(value = "FIELD", opcode = Opcodes.GETFIELD,
+            target = "Lcom/github/alexmodguy/alexscaves/server/config/BiomeGenerationNoiseCondition;humidity:[F"))
+    private float[] ru$temperatureAtTemperatureSample(@Coerce Object condition) {
+        return AlexsCavesIntegration.ENABLED.get() ? temperature : humidity;
+    }
+
+    @Redirect(method = "test", at = @At(value = "FIELD", opcode = Opcodes.GETFIELD,
+            target = "Lcom/github/alexmodguy/alexscaves/server/config/BiomeGenerationNoiseCondition;temperature:[F"))
+    private float[] ru$humidityAtHumiditySample(@Coerce Object condition) {
+        return AlexsCavesIntegration.ENABLED.get() ? humidity : temperature;
     }
 
     @Inject(method = "isFarEnoughFromSpawn", at = @At("HEAD"), cancellable = true)
