@@ -51,8 +51,11 @@ public final class AlexsCavesIntegration {
                 var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
                 return id.getNamespace().equals("alexscaves") && id.getPath().startsWith("cave_map");
             };
-            event.getParentEntries().removeIf(map);
-            event.getSearchEntries().removeIf(map);
+            // NeoForge exposes read-only views; remove entries through the event API.
+            event.getParentEntries().stream().filter(map).toList().forEach(stack ->
+                    event.remove(stack, net.minecraft.world.item.CreativeModeTab.TabVisibility.PARENT_TAB_ONLY));
+            event.getSearchEntries().stream().filter(map).toList().forEach(stack ->
+                    event.remove(stack, net.minecraft.world.item.CreativeModeTab.TabVisibility.SEARCH_TAB_ONLY));
         }
     }
 }

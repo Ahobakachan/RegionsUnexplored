@@ -4,6 +4,10 @@ This fork includes an optional NeoForge integration with Alex's Caves. Install R
 Lithostitched 1.7.9, Alex's Caves and Citadel on both client and server. Alex's Caves
 already generates its own biomes naturally; maps never create the biomes. RU keeps
 that generator, including cave carving, surface materials, structures and mobs.
+Lithostitched wraps the underlying Minecraft biome source and RU applies alternate
+biome layouts. The adapter binds Alex's native delegate to the correct world seed,
+dimension and biome registry, and preserves its cave result after RU's layout
+injection. This also makes generation and `/locate` use the same final biome source.
 
 The compatibility hooks only load on NeoForge. RU also works without Alex's Caves.
 Fabric cannot load the NeoForge Alex's Caves build.

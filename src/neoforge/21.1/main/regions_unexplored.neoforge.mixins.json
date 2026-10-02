@@ -12,7 +12,9 @@
     "compat.alexscaves.CaveMapWorkerMixin",
     "compat.alexscaves.CabinMapLootMixin",
     "compat.alexscaves.CaveMapTradesMixin",
-    "compat.alexscaves.CaveLocateMixin"
+    "compat.alexscaves.CaveLocateMixin",
+    "compat.alexscaves.LithostitchedCavesMixin",
+    "compat.alexscaves.CaveGenerationContextMixin"
   ],
   "client": [],
   "server": [],

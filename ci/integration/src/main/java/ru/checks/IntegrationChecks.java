@@ -181,17 +181,18 @@ public final class IntegrationChecks {
     private void checkGeneration(MinecraftServer server) throws Exception {
         ServerLevel level = server.overworld();
         var generator = (NoiseBasedChunkGenerator) level.getChunkSource().getGenerator();
-        var source = (MultiNoiseBiomeSource) generator.getBiomeSource();
+        var source = generator.getBiomeSource();
+        Object nativeSource = source.getClass().getMethod("rootDelegate").invoke(source);
         Class<?> accessor = Class.forName(AC + "server.level.biome.MultiNoiseBiomeSourceAccessor");
         var setSeed = accessor.getMethod("setLastSampledSeed", long.class);
         var setDimension = accessor.getMethod("setLastSampledDimension", net.minecraft.resources.ResourceKey.class);
-        setDimension.invoke(source, Level.OVERWORLD);
+        setDimension.invoke(nativeSource, Level.OVERWORLD);
         List<Object> seeds = new ArrayList<>();
         Map<String, Integer> total = new LinkedHashMap<>();
         Map<String, BlockPos> examples = new LinkedHashMap<>();
         long lastHash = 0;
         for (long seed : new long[]{level.getSeed(), 12345, 8675309}) {
-            setSeed.invoke(source, seed);
+            setSeed.invoke(nativeSource, seed);
             var random = RandomState.create(generator.generatorSettings().value(),
                     level.registryAccess().lookupOrThrow(Registries.NOISE), seed);
             Map<String, Integer> counts = new LinkedHashMap<>();
@@ -227,17 +228,28 @@ public final class IntegrationChecks {
             seeds.add(Map.of("seed", seed, "samples", samples, "cave_fraction", fraction,
                     "nearest_cave_blocks", nearestCave, "counts", counts));
         }
-        setSeed.invoke(source, level.getSeed());
+        setSeed.invoke(nativeSource, level.getSeed());
         for (String cave : CAVES) require(total.getOrDefault("alexscaves:" + cave, 0) > 0, "Missing cave: " + cave);
         require(total.getOrDefault("minecraft:deep_dark", 0) > 0, "Deep Dark has disappeared");
         require(total.keySet().stream().anyMatch(id -> id.startsWith("regions_unexplored:")), "RU caves have disappeared");
         for (var example : examples.entrySet()) {
             BlockPos pos = example.getValue();
-            level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-            require(level.getChunk(pos.getX() >> 4, pos.getZ() >> 4)
+            var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+            require(chunk
                             .getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2)
                             .unwrapKey().orElseThrow().location().toString().equals(example.getKey()),
                     "Generated chunk disagrees with biome source: " + example);
+            require(chunk.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE,
+                            pos.getX() & 15, pos.getZ() & 15) > level.getMinBuildHeight() + 16,
+                    "Located cave chunk has no terrain: " + example);
+            int caveBlocks = 0;
+            for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) {
+                for (int y = level.getMinBuildHeight(); y < 64; y++) {
+                    var state = chunk.getBlockState(new BlockPos((pos.getX() & ~15) + x, y, (pos.getZ() & ~15) + z));
+                    if (BuiltInRegistries.BLOCK.getKey(state.getBlock()).getNamespace().equals("alexscaves")) caveBlocks++;
+                }
+            }
+            require(caveBlocks > 0, "Cave biome has no Alex's Caves blocks/features: " + example);
         }
         report.put("generation", seeds);
         report.put("generated_cave_chunks", examples.keySet());
@@ -292,11 +304,14 @@ public final class IntegrationChecks {
         for (var dimension : List.of(Level.NETHER, Level.END)) {
             ServerLevel level = server.getLevel(dimension);
             var source = level.getChunkSource().getGenerator().getBiomeSource();
+            Object nativeSource = source;
+            if (source.getClass().getName().contains("InjectorBiomeSource"))
+                nativeSource = source.getClass().getMethod("rootDelegate").invoke(source);
             var sampler = level.getChunkSource().randomState().sampler();
-            if (source instanceof MultiNoiseBiomeSource) {
+            if (nativeSource instanceof MultiNoiseBiomeSource) {
                 Class<?> accessor = Class.forName(AC + "server.level.biome.MultiNoiseBiomeSourceAccessor");
-                accessor.getMethod("setLastSampledSeed", long.class).invoke(source, level.getSeed());
-                accessor.getMethod("setLastSampledDimension", net.minecraft.resources.ResourceKey.class).invoke(source, dimension);
+                accessor.getMethod("setLastSampledSeed", long.class).invoke(nativeSource, level.getSeed());
+                accessor.getMethod("setLastSampledDimension", net.minecraft.resources.ResourceKey.class).invoke(nativeSource, dimension);
             }
             for (int x = -2048; x <= 2048; x += 128) {
                 for (int z = -2048; z <= 2048; z += 128) {

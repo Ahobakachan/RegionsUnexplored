@@ -12,6 +12,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.neoforged.fml.ModList;
 import net.regions_unexplored.compat.AlexsCavesIntegration;
+import net.regions_unexplored.compat.AlexsCavesBiomeSources;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,16 +30,9 @@ public abstract class CaveLocateMixin {
         if (!ModList.get().isLoaded("alexscaves") || !AlexsCavesIntegration.ENABLED.get()) return;
         ServerLevel level = (ServerLevel) (Object) this;
         var source = level.getChunkSource().getGenerator().getBiomeSource();
-        if (!(source instanceof MultiNoiseBiomeSource) || source.possibleBiomes().stream().noneMatch(holder ->
+        AlexsCavesBiomeSources.configure(source, level);
+        if (!(AlexsCavesBiomeSources.root(source) instanceof MultiNoiseBiomeSource) || source.possibleBiomes().stream().noneMatch(holder ->
                 holder.unwrapKey().orElseThrow().identifier().getNamespace().equals("alexscaves") && predicate.test(holder))) return;
-        try {
-            // This optional upstream interface is not referenced on the RU-only classpath.
-            Class<?> accessor = Class.forName("com.github.alexmodguy.alexscaves.server.level.biome.MultiNoiseBiomeSourceAccessor");
-            accessor.getMethod("setLastSampledSeed", long.class).invoke(source, level.getSeed());
-            accessor.getMethod("setLastSampledDimension", ResourceKey.class).invoke(source, level.dimension());
-        } catch (ReflectiveOperationException error) {
-            throw new IllegalStateException("Unsupported Alex's Caves biome-source interface", error);
-        }
         var sampler = level.getChunkSource().randomState().sampler();
         int startY = Mth.clamp(origin.getY(), level.getMinBuildHeight() + 1, level.getMaxBuildHeight() - 1);
         int[] heights = Mth.outFromOrigin(startY, level.getMinBuildHeight() + 1,
