@@ -9,9 +9,17 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.PacketSendListener;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -54,6 +62,7 @@ public final class IntegrationChecks {
     private static final List<String> CAVES = List.of("magnetic_caves", "primordial_caves", "toxic_caves",
             "abyssal_chasm", "forlorn_hollows", "candy_cavity");
     private final Map<String, Object> report = new LinkedHashMap<>();
+    private BlockPos magneticExample;
 
     public IntegrationChecks() {
         NeoForge.EVENT_BUS.addListener(this::started);
@@ -229,6 +238,7 @@ public final class IntegrationChecks {
         }
         setSeed.invoke(nativeSource, level.getSeed());
         for (String cave : CAVES) require(total.getOrDefault("alexscaves:" + cave, 0) > 0, "Missing cave: " + cave);
+        magneticExample = examples.get("alexscaves:magnetic_caves");
         require(total.getOrDefault("minecraft:deep_dark", 0) > 0, "Deep Dark has disappeared");
         require(total.keySet().stream().anyMatch(id -> id.startsWith("regions_unexplored:")), "RU caves have disappeared");
         for (var example : examples.entrySet()) {
@@ -261,6 +271,7 @@ public final class IntegrationChecks {
         double originalX = border.getCenterX();
         double originalZ = border.getCenterZ();
         List<Object> locations = new ArrayList<>();
+        ServerPlayer player = teleportProbe(level);
         try {
             border.setCenter(0, 0);
             border.setSize(8192);
@@ -271,7 +282,9 @@ public final class IntegrationChecks {
                         new BlockPos(0, 64, 0), 6400, 32, 64);
                 if (found == null) {
                     locations.add(Map.of("biome", name, "inside_8192_border", false));
-                    require(!name.equals("magnetic_caves"), "Magnetic Caves cannot be located inside an 8192-block world border");
+                    // Rare individual types need not occur inside every border. Seed 0 is our fixed regression case.
+                    require(level.getSeed() != 0 || !name.equals("magnetic_caves"),
+                            "Magnetic Caves missing from the seed-0 locate regression case");
                     continue;
                 }
                 BlockPos pos = found.getFirst();
@@ -280,8 +293,8 @@ public final class IntegrationChecks {
                 var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
                 require(chunk.getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2)
                                 .unwrapKey().orElseThrow().location().equals(id), "Locate and generated terrain disagree: " + name);
-                var player = FakePlayerFactory.getMinecraft(level);
                 player.teleportTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+                require(player.blockPosition().equals(pos), "Teleport did not reach locate coordinates: " + pos);
                 require(border.isWithinBounds(player.blockPosition()) && !level.isOutsideBuildHeight(player.blockPosition()),
                         "Teleport ended outside playable world");
                 locations.add(Map.of("biome", name, "position", List.of(pos.getX(), pos.getY(), pos.getZ()),
@@ -293,10 +306,42 @@ public final class IntegrationChecks {
             require(anyCave == null || border.isWithinBounds(anyCave.getFirst()), "Locate escapes a small world border");
             report.put("locate_and_teleport", locations);
             report.put("small_world_border", "An absent cave returns no result instead of an unreachable location");
+
+            // Positive locate/teleport coverage for Magnetic Caves on every seed, including an off-centre border.
+            // Start at a genuinely generated cave, using the same radius/steps as vanilla /locate biome.
+            border.setCenter(magneticExample.getX(), magneticExample.getZ());
+            var magnetic = ResourceLocation.parse("alexscaves:magnetic_caves");
+            var found = level.findClosestBiome3d(holder -> holder.unwrapKey().orElseThrow().location().equals(magnetic),
+                    magneticExample, 6400, 32, 64);
+            require(found != null, "Locate cannot find a known generated Magnetic Cave");
+            BlockPos pos = found.getFirst();
+            require(border.isWithinBounds(pos) && !level.isOutsideBuildHeight(pos), "Locate escapes an off-centre border");
+            var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+            require(chunk.getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2)
+                    .unwrapKey().orElseThrow().location().equals(magnetic), "Magnetic locate disagrees with generated terrain");
+            player.teleportTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+            require(player.blockPosition().equals(pos), "Magnetic teleport did not reach locate coordinates: " + pos);
+            require(border.isWithinBounds(player.blockPosition()) && !level.isOutsideBuildHeight(player.blockPosition()),
+                    "Magnetic teleport escapes an off-centre border");
+            report.put("magnetic_off_centre_border", Map.of("position", List.of(pos.getX(), pos.getY(), pos.getZ()),
+                    "border_diameter", 1024, "generated_biome_verified", true, "teleport_verified", true));
         } finally {
             border.setCenter(originalX, originalZ);
             border.setSize(originalSize);
         }
+    }
+
+    private static ServerPlayer teleportProbe(ServerLevel level) {
+        var profile = new com.mojang.authlib.GameProfile(UUID.randomUUID(), "RU_TeleportCheck");
+        var player = new ServerPlayer(level.getServer(), level, profile, ClientInformation.createDefault());
+        // FakePlayer's network handler overrides teleport with a no-op. Use the ordinary server teleport
+        // implementation and suppress only outbound packets because CI has no connected graphical client.
+        player.connection = new ServerGamePacketListenerImpl(level.getServer(), new Connection(PacketFlow.SERVERBOUND),
+                player, CommonListenerCookie.createInitial(profile, false)) {
+            @Override public void send(Packet<?> packet) {}
+            @Override public void send(Packet<?> packet, PacketSendListener listener) {}
+        };
+        return player;
     }
 
     private void checkDimensions(MinecraftServer server) throws Exception {

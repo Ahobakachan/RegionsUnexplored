@@ -82,11 +82,13 @@ types, coexistence with RU and Deep Dark, above-ground and dimension isolation,
 different layouts across seeds, and generated chunks at discovered cave locations.
 It also reproduces `/locate` searches and teleports for Magnetic Caves and the other
 cave types inside an 8192-block border, and checks that a 1024-block border cannot
-produce an unreachable result.
+produce an unreachable result. Individual types may be absent from the border;
+each seed also checks successful Magnetic Caves locate/teleport inside an off-centre
+border around a known generated cave.
 Its sampling guard rejects no caves or more than 12% cave coverage at Y=-32; the
 reported fraction is a sample statistic, not a guarantee for every world.
 
-Download **minecraft-1.21.1-neoforge-mods** only after both server checks pass. Add
+Download **minecraft-1.21.1-neoforge-mods** only after all server checks pass. Add
 Lithostitched 1.7.9 separately. The artifact also includes upstream source for review
 and licence compliance. Assertion reports and server logs are available in the
 `checks-with-caves-<seed>` and `checks-ru-only-0` artifacts and the Actions run summary.
