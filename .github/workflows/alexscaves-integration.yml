@@ -1,0 +1,118 @@
+name: Alex's Caves integration
+
+on:
+  push:
+    branches: [21.1, alexscaves-natural-generation]
+  pull_request:
+    branches: [21.1]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alexscaves-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build RU, Citadel and Alex's Caves (1.21.1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - name: Build Regions Unexplored NeoForge
+        run: bash gradlew neoforge211RemapJar -x downloadNeoforge211Assets --no-daemon
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: AlexModGuy/Citadel
+          ref: badebf6505f56650fd770887329d82b1a88f3f79 # 1.21, version 2.7.1
+          path: _upstream/Citadel
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: AlexModGuy/AlexsCaves
+          ref: 0ab3c214b72c846c2c1ea713a37e2b4b3a00a9f5 # 1.21.1, version 2.0.2
+          path: _upstream/AlexsCaves
+          persist-credentials: false
+      - name: Prepare pinned upstream dependency
+        run: python3 ci/prepare_upstream.py _upstream/AlexsCaves
+      - name: Build Citadel
+        working-directory: _upstream/Citadel
+        run: bash gradlew build --no-daemon
+      - name: Build Alex's Caves
+        working-directory: _upstream/AlexsCaves
+        run: bash gradlew build --no-daemon
+      - name: Stage production mod jars
+        run: python3 ci/stage_mods.py build artifacts/mods
+      - name: Preserve upstream source and dependency adaptation
+        run: |
+          mkdir -p artifacts/sources
+          tar --exclude=.git --exclude=build --exclude=.gradle -czf artifacts/sources/upstream-source.tar.gz -C _upstream Citadel AlexsCaves
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: minecraft-1.21.1-neoforge-mods
+          path: artifacts
+          if-no-files-found: error
+          retention-days: 14
+
+  integration:
+    name: Test packaged mods (${{ matrix.mode }})
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [with-caves, ru-only]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: minecraft-1.21.1-neoforge-mods
+          path: artifacts
+      - name: Stage test mod set
+        env:
+          CHECK_MODE: ${{ matrix.mode }}
+        run: python3 ci/stage_mods.py "$CHECK_MODE" ci/integration/mods
+      - name: Run a real dedicated server and integration assertions
+        env:
+          CHECK_MODE: ${{ matrix.mode }}
+        run: |
+          curl --fail --location --retry 3 -o /tmp/gradle.zip https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
+          unzip -q /tmp/gradle.zip -d /tmp
+          /tmp/gradle-8.10.2/bin/gradle -p ci/integration runServer -PcheckMode="$CHECK_MODE" --no-daemon
+      - name: Verify assertion report
+        run: python3 ci/check_report.py ci/integration/build/compat-report.json
+      - name: Add report to Actions summary
+        if: always()
+        run: |
+          if test -f ci/integration/build/compat-report.json; then
+            printf '```json\n' >> "$GITHUB_STEP_SUMMARY"
+            cat ci/integration/build/compat-report.json >> "$GITHUB_STEP_SUMMARY"
+            printf '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: checks-${{ matrix.mode }}
+          path: |
+            ci/integration/build/compat-report.json
+            ci/integration/run/logs
+            ci/integration/run/crash-reports
+          if-no-files-found: warn
+          retention-days: 14

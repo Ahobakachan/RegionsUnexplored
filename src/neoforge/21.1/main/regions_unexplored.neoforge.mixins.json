@@ -4,7 +4,16 @@
   "package": "net.regions_unexplored.mixin",
   "compatibilityLevel": "JAVA_21",
   "refmap": "${mod_id}.refmap.json",
-  "mixins": [],
+  "mixins": [
+    "compat.alexscaves.CaveRarityMixin",
+    "compat.alexscaves.CaveClimateMixin",
+    "compat.alexscaves.CaveMapRecipeMixin",
+    "compat.alexscaves.CaveMapItemMixin",
+    "compat.alexscaves.CaveMapWorkerMixin",
+    "compat.alexscaves.CabinMapLootMixin",
+    "compat.alexscaves.CaveMapTradesMixin",
+    "compat.alexscaves.CaveLocateMixin"
+  ],
   "client": [],
   "server": [],
   "injectors": {
