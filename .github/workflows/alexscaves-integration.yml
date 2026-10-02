@@ -64,14 +64,22 @@ jobs:
           retention-days: 14
 
   integration:
-    name: Test packaged mods (${{ matrix.mode }})
+    name: Test packaged mods (${{ matrix.mode }}, seed ${{ matrix.seed }})
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
-        mode: [with-caves, ru-only]
+        include:
+          - mode: with-caves
+            seed: 0
+          - mode: with-caves
+            seed: 12345
+          - mode: with-caves
+            seed: 8675309
+          - mode: ru-only
+            seed: 0
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -88,14 +96,16 @@ jobs:
       - name: Stage test mod set
         env:
           CHECK_MODE: ${{ matrix.mode }}
-        run: python3 ci/stage_mods.py "$CHECK_MODE" ci/integration/mods
+          CHECK_SEED: ${{ matrix.seed }}
+        run: python3 ci/stage_mods.py "$CHECK_MODE" ci/integration/mods "$CHECK_SEED"
       - name: Run a real dedicated server and integration assertions
         env:
           CHECK_MODE: ${{ matrix.mode }}
+          CHECK_SEED: ${{ matrix.seed }}
         run: |
           curl --fail --location --retry 3 -o /tmp/gradle.zip https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
           unzip -q /tmp/gradle.zip -d /tmp
-          /tmp/gradle-8.10.2/bin/gradle -p ci/integration runServer -PcheckMode="$CHECK_MODE" --no-daemon
+          /tmp/gradle-8.10.2/bin/gradle -p ci/integration runServer -PcheckMode="$CHECK_MODE" -PcheckSeed="$CHECK_SEED" --no-daemon
       - name: Verify assertion report
         run: python3 ci/check_report.py ci/integration/build/compat-report.json
       - name: Add report to Actions summary
@@ -109,10 +119,24 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: checks-${{ matrix.mode }}
+          name: checks-${{ matrix.mode }}-${{ matrix.seed }}
           path: |
             ci/integration/build/compat-report.json
-            ci/integration/run/logs
-            ci/integration/run/crash-reports
+            ci/integration/run-*/logs
+            ci/integration/run-*/crash-reports
           if-no-files-found: warn
           retention-days: 14
+
+  verify-seeds:
+    name: Verify different layouts across three real worlds
+    needs: integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: checks-with-caves-*
+          path: reports
+      - run: python3 ci/check_seeds.py reports

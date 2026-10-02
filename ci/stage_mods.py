@@ -19,9 +19,12 @@ elif mode in ("with-caves", "ru-only"):
     for jar in Path("artifacts/mods").glob("*.jar"):
         if mode == "with-caves" or "regions-unexplored" in jar.name:
             shutil.copy2(jar, destination / jar.name)
-    run = destination.parent / "run"
+    seed = sys.argv[3] if len(sys.argv) > 3 else "0"
+    run = destination.parent / f"run-{mode}-{seed}"
     run.mkdir(parents=True, exist_ok=True)
     (run / "eula.txt").write_text("eula=true\n", encoding="utf-8")
-    (run / "server.properties").write_text("level-seed=0\nonline-mode=false\nview-distance=2\nsimulation-distance=2\n", encoding="utf-8")
+    (run / "server.properties").write_text(
+        f"level-seed={seed}\nonline-mode=false\nserver-ip=127.0.0.1\nserver-port=0\n"
+        "view-distance=2\nsimulation-distance=2\nmax-tick-time=0\n", encoding="utf-8")
 else:
     raise SystemExit(f"Unknown staging mode: {mode}")

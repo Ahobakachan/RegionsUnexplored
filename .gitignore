@@ -26,3 +26,4 @@ runs
 /_upstream/
 /artifacts/
 /ci/integration/mods/
+/ci/integration/run-*/

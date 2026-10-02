@@ -4,12 +4,17 @@ plugins {
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+def checkMode = project.findProperty('checkMode') ?: 'with-caves'
+def checkSeed = project.findProperty('checkSeed') ?: '0'
 repositories {
     mavenCentral()
     maven { url = 'https://api.modrinth.com/maven' }
 }
 dependencies {
-    implementation fileTree('mods') { include '*.jar' }
+    implementation fileTree('mods') {
+        include '*.jar'
+        if (checkMode == 'ru-only') exclude 'alexscaves*', 'citadel*'
+    }
     implementation 'maven.modrinth:lithostitched:1.7.9-neoforge-21.1'
 }
 neoForge {
@@ -18,7 +23,8 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
-            systemProperty 'ru.check.mode', project.findProperty('checkMode') ?: 'with-caves'
+            gameDirectory = file("run-${checkMode}-${checkSeed}")
+            systemProperty 'ru.check.mode', checkMode
         }
     }
     mods {

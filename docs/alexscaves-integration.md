@@ -89,7 +89,8 @@ reported fraction is a sample statistic, not a guarantee for every world.
 Download **minecraft-1.21.1-neoforge-mods** only after both server checks pass. Add
 Lithostitched 1.7.9 separately. The artifact also includes upstream source for review
 and licence compliance. Assertion reports and server logs are available in the
-`checks-with-caves` and `checks-ru-only` artifacts and the Actions run summary.
+`checks-with-caves-<seed>` and `checks-ru-only-0` artifacts and the Actions run summary.
+Each seed runs in a separate real world; a final job verifies that their biome layouts differ.
 
 Local checks use Java 21, `bash gradlew neoforge211IncludeJar -x
 downloadNeoforge211Assets`, the two pinned upstream checkouts under `_upstream/`,

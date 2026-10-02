@@ -191,10 +191,9 @@ public final class IntegrationChecks {
         Map<String, Integer> total = new LinkedHashMap<>();
         Map<String, BlockPos> examples = new LinkedHashMap<>();
         long lastHash = 0;
-        for (long seed : new long[]{level.getSeed(), 12345, 8675309}) {
+        for (long seed : new long[]{level.getSeed()}) {
             setSeed.invoke(nativeSource, seed);
-            var random = RandomState.create(generator.generatorSettings().value(),
-                    level.registryAccess().lookupOrThrow(Registries.NOISE), seed);
+            var random = level.getChunkSource().randomState();
             Map<String, Integer> counts = new LinkedHashMap<>();
             long hash = 1;
             int samples = 0;
@@ -226,7 +225,7 @@ public final class IntegrationChecks {
             require(fraction > 0.001 && fraction < 0.12, "Caves absent or too common: " + fraction);
             require(nearestCave <= 4096, "Caves only appear far from spawn: nearest sampled cave " + nearestCave);
             seeds.add(Map.of("seed", seed, "samples", samples, "cave_fraction", fraction,
-                    "nearest_cave_blocks", nearestCave, "counts", counts));
+                    "nearest_cave_blocks", nearestCave, "layout_hash", Long.toString(hash), "counts", counts));
         }
         setSeed.invoke(nativeSource, level.getSeed());
         for (String cave : CAVES) require(total.getOrDefault("alexscaves:" + cave, 0) > 0, "Missing cave: " + cave);
